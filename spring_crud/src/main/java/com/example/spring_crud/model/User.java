@@ -1,18 +1,25 @@
-package model;
+package com.example.spring_crud.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
 
 @Entity
+@Table(name = "users_table")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -44,9 +51,4 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-
-    private String email;
-    private String password;
-
 }
-
