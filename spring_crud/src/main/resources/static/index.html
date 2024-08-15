@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f4f4f4; }
+        form { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+<h1>User Management</h1>
+
+<!-- Form for Creating and Updating Users -->
+<form id="userForm">
+    <input type="hidden" id="userId" />
+    <div>
+        <label for="name">Name:</label>
+        <input type="text" id="name" required />
+    </div>
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" required />
+    </div>
+    <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" required />
+    </div>
+    <button type="submit">Save User</button>
+</form>
+
+<a href="https://github.com/logout">Logout do GitHub</a>
+
+<!-- User Table -->
+<table id="userTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    const apiBaseUrl = '/api/users';
+
+    // Fetch and display all users
+    function fetchUsers() {
+        fetch(apiBaseUrl)
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.querySelector('#userTable tbody');
+                tableBody.innerHTML = '';
+                data.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>
+                            <button onclick="editUser(${user.id})">Edit</button>
+                            <button onclick="deleteUser(${user.id})">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            });
+    }
+
+    // Create or update a user
+    document.getElementById('userForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const id = document.getElementById('userId').value;
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `${apiBaseUrl}/${id}` : apiBaseUrl;
+        const data = { name, email, password };
+
+        fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(() => {
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+            fetchUsers();
+        });
+    });
+
+    // Edit a user
+    function editUser(id) {
+        fetch(`${apiBaseUrl}/${id}`)
+            .then(response => response.json())
+            .then(user => {
+                document.getElementById('userId').value = user.id;
+                document.getElementById('name').value = user.name;
+                document.getElementById('email').value = user.email;
+                document.getElementById('password').value = user.password;
+            });
+    }
+
+    // Delete a user
+    function deleteUser(id) {
+        fetch(`${apiBaseUrl}/${id}`, {
+            method: 'DELETE'
+        })
+        .then(() => fetchUsers());
+    }
+
+    // Initial fetch
+    fetchUsers();
+
+
+</script>
+</body>
+</html>
