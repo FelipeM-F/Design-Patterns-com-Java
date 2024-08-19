@@ -21,7 +21,7 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth2Login ->
                         oauth2Login
-                                .defaultSuccessUrl("/", true)
+                                .defaultSuccessUrl("/swagger-ui/index.html", true)
                 )
                 .logout(logout ->
                         logout
